@@ -1,3 +1,9 @@
+
+Example project to illustrate usage of the [`panic-serial`](https://crates.io/crates/panic-serial) crate.
+
+Below here is the original README of the avr-hal-template.
+
+
 `avr-hal-template`
 ==================
 [`cargo-generate`] template for jumpstarting projects on common AVR
