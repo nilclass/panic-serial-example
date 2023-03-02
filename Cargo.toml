@@ -11,7 +11,7 @@ test = false
 bench = false
 
 [dependencies]
-panic-halt = "0.2.0"
+panic-serial = { path = "../panic-serial", features = ["full"] }
 ufmt = "0.1.0"
 nb = "0.1.2"
 embedded-hal = "0.2.3"

@@ -1,27 +1,30 @@
 #![no_std]
 #![no_main]
 
-use panic_halt as _;
+panic_serial::impl_panic_handler!(
+  // This must be the exact type returned by `arduino_hal::default_serial!`.
+  arduino_hal::usart::Usart<
+    arduino_hal::pac::USART0,
+    arduino_hal::port::Pin<arduino_hal::port::mode::Input, arduino_hal::hal::port::PD0>,
+    arduino_hal::port::Pin<arduino_hal::port::mode::Output, arduino_hal::hal::port::PD1>
+  >
+);
 
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
+    let serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    /*
-     * For examples (and inspiration), head to
-     *
-     *     https://github.com/Rahix/avr-hal/tree/main/examples
-     *
-     * NOTE: Not all examples were ported to all boards!  There is a good chance though, that code
-     * for a different board can be adapted for yours.  The Arduino Uno currently has the most
-     * examples available.
-     */
+    // panic-serial takes ownership of the serial port, and returns a `&'static mut` reference to it:
+    let serial = share_serial_port_with_panic(serial);
 
-    let mut led = pins.d13.into_output();
+    // continue using `serial` as you would normally do:
+    ufmt::uwriteln!(serial, "Hello from rust!\r").unwrap();
 
-    loop {
-        led.toggle();
-        arduino_hal::delay_ms(1000);
-    }
+    // cause a panic
+    let opt: Option<u8> = None;
+    opt.expect("Oh no! There is no number in here!");
+
+    loop {}
 }
